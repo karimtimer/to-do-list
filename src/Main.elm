@@ -19,6 +19,20 @@ init =
 
 
 
+---- PROGRAM ----
+
+
+main : Program () Model Msg
+main =
+    Browser.element
+        { view = view
+        , init = \_ -> init
+        , update = update
+        , subscriptions = always Sub.none
+        }
+
+
+
 ---- UPDATE ----
 
 
@@ -38,20 +52,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+        [ h1 [] [ text "To do list" ]
+        , viewItems
         ]
 
 
-
----- PROGRAM ----
-
-
-main : Program () Model Msg
-main =
-    Browser.element
-        { view = view
-        , init = \_ -> init
-        , update = update
-        , subscriptions = always Sub.none
-        }
+viewItems : Html Msg
+viewItems =
+    div [] [ text "Items" ]

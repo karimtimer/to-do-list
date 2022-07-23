@@ -1,8 +1,9 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, div, h1, img, text)
-import Html.Attributes exposing (src)
+import Html exposing (Html, button, div, h1, img, input, text, ul)
+import Html.Attributes exposing (placeholder, src, value)
+import Html.Events exposing (onClick, onInput)
 
 
 
@@ -10,12 +11,20 @@ import Html.Attributes exposing (src)
 
 
 type alias Model =
-    {}
+    { toDoText : String
+    , toDoList : List String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
+    let
+        initModel =
+            { toDoText = ""
+            , toDoList = [ "first" ]
+            }
+    in
+    ( initModel, Cmd.none )
 
 
 
@@ -37,12 +46,18 @@ main =
 
 
 type Msg
-    = NoOp
+    = SaveItem String
+    | CurrentItem String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        SaveItem toAdd ->
+            ( { model | toDoList = toAdd :: model.toDoList }, Cmd.none )
+
+        CurrentItem item ->
+            ( { model | toDoText = item }, Cmd.none )
 
 
 
@@ -53,10 +68,20 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "To do list" ]
-        , viewItems
+        , input [ placeholder "Type your To do here..", value model.toDoText, onInput CurrentItem ] []
+        , button [ onClick (SaveItem model.toDoText) ] [ text "Add" ]
+        , viewItems model.toDoList
         ]
 
 
-viewItems : Html Msg
-viewItems =
-    div [] [ text "Items" ]
+viewItems : List String -> Html Msg
+viewItems items =
+    div []
+        [ text "Items"
+        , ul [] (List.map viewItem items)
+        ]
+
+
+viewItem : String -> Html Msg
+viewItem item =
+    div [] [ text item ]

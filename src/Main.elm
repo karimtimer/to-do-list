@@ -6,12 +6,16 @@ import Html.Attributes exposing (disabled, placeholder, src, value)
 import Html.Events exposing (onClick, onInput)
 
 
+type alias ToDo =
+    { text : String }
+
+
 
 ---- MODEL ----
 
 
 type alias Model =
-    { toDoText : String
+    { toDo : ToDo
     , toDoList : List String
     }
 
@@ -19,8 +23,11 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     let
+        toDo =
+            { text = "" }
+
         initModel =
-            { toDoText = ""
+            { toDo = toDo
             , toDoList = [ "" ]
             }
     in
@@ -57,7 +64,11 @@ update msg model =
             ( { model | toDoList = toAdd :: model.toDoList }, Cmd.none )
 
         CurrentItem item ->
-            ( { model | toDoText = item }, Cmd.none )
+            let
+                toDo =
+                    model.toDo
+            in
+            ( { model | toDo = { toDo | text = item } }, Cmd.none )
 
 
 
@@ -68,8 +79,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "To do list" ]
-        , input [ placeholder "Type your To do here..", value model.toDoText, onInput CurrentItem ] []
-        , button [ disabled (canSubmit model.toDoText), onClick (SaveItem model.toDoText) ] [ text "Add" ]
+        , input [ placeholder "Type your To do here..", value model.toDo.text, onInput CurrentItem ] []
+        , button [ disabled (canSubmit model.toDo.text), onClick (SaveItem model.toDo.text) ] [ text "Add" ]
         , h2 [] [ text "Items" ]
         , viewItems model.toDoList
         ]

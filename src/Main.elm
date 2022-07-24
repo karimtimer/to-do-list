@@ -61,7 +61,17 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SaveItem toAdd ->
-            ( { model | toDoList = toAdd :: model.toDoList }, Cmd.none )
+            let
+                toDo =
+                    model.toDo
+
+                updatedModel =
+                    { model
+                        | toDoList = toAdd :: model.toDoList
+                        , toDo = { toDo | text = "" }
+                    }
+            in
+            ( updatedModel, Cmd.none )
 
         CurrentItem item ->
             let

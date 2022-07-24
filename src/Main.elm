@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, h1, img, input, text, ul)
-import Html.Attributes exposing (placeholder, src, value)
+import Html exposing (Html, button, div, h1, h2, img, input, text, ul)
+import Html.Attributes exposing (disabled, placeholder, src, value)
 import Html.Events exposing (onClick, onInput)
 
 
@@ -21,7 +21,7 @@ init =
     let
         initModel =
             { toDoText = ""
-            , toDoList = [ "first" ]
+            , toDoList = [ "" ]
             }
     in
     ( initModel, Cmd.none )
@@ -69,17 +69,20 @@ view model =
     div []
         [ h1 [] [ text "To do list" ]
         , input [ placeholder "Type your To do here..", value model.toDoText, onInput CurrentItem ] []
-        , button [ onClick (SaveItem model.toDoText) ] [ text "Add" ]
+        , button [ disabled (canSubmit model.toDoText), onClick (SaveItem model.toDoText) ] [ text "Add" ]
+        , h2 [] [ text "Items" ]
         , viewItems model.toDoList
         ]
 
 
+canSubmit : String -> Bool
+canSubmit todo =
+    String.isEmpty todo
+
+
 viewItems : List String -> Html Msg
 viewItems items =
-    div []
-        [ text "Items"
-        , ul [] (List.map viewItem items)
-        ]
+    div [] [ ul [] (List.map viewItem items) ]
 
 
 viewItem : String -> Html Msg

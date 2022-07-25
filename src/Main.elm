@@ -15,7 +15,7 @@ type alias ToDo =
 
 
 type alias Model =
-    { toDo : ToDo
+    { toDo : Maybe ToDo
     , toDoList : List String
     }
 
@@ -23,11 +23,8 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     let
-        toDo =
-            { text = "" }
-
         initModel =
-            { toDo = toDo
+            { toDo = Nothing
             , toDoList = [ "" ]
             }
     in
@@ -68,7 +65,7 @@ update msg model =
                 updatedModel =
                     { model
                         | toDoList = toAdd :: model.toDoList
-                        , toDo = { toDo | text = "" }
+                        , toDo = Nothing
                     }
             in
             ( updatedModel, Cmd.none )
@@ -78,7 +75,12 @@ update msg model =
                 toDo =
                     model.toDo
             in
-            ( { model | toDo = { toDo | text = item } }, Cmd.none )
+            case toDo of
+                Just t ->
+                    ( { model | toDo = Just { t | text = item } }, Cmd.none )
+
+                Nothing ->
+                    ( { model | toDo = Nothing }, Cmd.none )
 
 
 
@@ -89,16 +91,31 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "To do list" ]
-        , input [ placeholder "Type your To do here..", value model.toDo.text, onInput CurrentItem ] []
-        , button [ disabled (canSubmit model.toDo.text), onClick (SaveItem model.toDo.text) ] [ text "Add" ]
+        , viewTodoToAdd model.toDo
+        , button [ disabled (isEmpty model.toDo), onClick (SaveItem model.toDo.text) ] [ text "Add" ]
         , h2 [] [ text "Items" ]
         , viewItems model.toDoList
         ]
 
 
-canSubmit : String -> Bool
-canSubmit todo =
-    String.isEmpty todo
+viewTodoToAdd : Maybe ToDo -> Html Msg
+viewTodoToAdd toDo =
+    case toDo of
+        Just t ->
+            input [ placeholder "Type your To do here..", value t.text, onInput CurrentItem ] []
+
+        Nothing ->
+            input [ placeholder "Type your To do here..", value "", onInput CurrentItem ] []
+
+
+isEmpty : Maybe ToDo -> Bool
+isEmpty toDo =
+    case toDo of
+        Just t ->
+            String.isEmpty t.text
+
+        Nothing ->
+            True
 
 
 viewItems : List String -> Html Msg
